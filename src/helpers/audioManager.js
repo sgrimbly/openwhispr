@@ -12,7 +12,7 @@ import {
 } from "./localSpeechGate";
 import { getSettings, getEffectiveCleanupModel, isCloudCleanupMode } from "../stores/settingsStore";
 import { detectAgentName } from "../config/agentDetection";
-import { resolvePrompt } from "../config/prompts";
+import { resolvePrompt, wrapAsTranscription } from "../config/prompts";
 import { syncService } from "../services/SyncService.js";
 
 const REASONING_CACHE_TTL = 30000; // 30 seconds
@@ -1105,6 +1105,8 @@ registerProcessor("pcm-streaming-processor", PCMStreamingProcessor);
 
         const targetModel = route.kind === "agent" ? route.model : cleanupModel;
         const reasoningConfig = route.config;
+        const inputText =
+          route.kind === "cleanup" ? wrapAsTranscription(normalizedText) : normalizedText;
 
         logger.logReasoning("SENDING_TO_REASONING", {
           preparedTextLength: normalizedText.length,
@@ -1115,7 +1117,7 @@ registerProcessor("pcm-streaming-processor", PCMStreamingProcessor);
         });
 
         const result = await this.processWithReasoningModel(
-          normalizedText,
+          inputText,
           targetModel,
           agentName,
           reasoningConfig
@@ -1386,7 +1388,7 @@ registerProcessor("pcm-streaming-processor", PCMStreamingProcessor);
         const effectiveModel = getEffectiveCleanupModel();
         if (effectiveModel) {
           const reasoned = await this.processWithReasoningModel(
-            processedText,
+            wrapAsTranscription(processedText),
             effectiveModel,
             agentName,
             route.config
@@ -2637,7 +2639,7 @@ registerProcessor("pcm-streaming-processor", PCMStreamingProcessor);
           const effectiveModel = getEffectiveCleanupModel();
           if (effectiveModel) {
             const reasoned = await this.processWithReasoningModel(
-              finalText,
+              wrapAsTranscription(finalText),
               effectiveModel,
               agentName,
               route.config
