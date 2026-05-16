@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- **OpenRouter STT**: Added OpenRouter as a first-class cloud transcription provider, sitting alongside OpenAI, Groq, Mistral, and Custom in the Speech-to-Text tab. OpenRouter's transcription endpoint takes a JSON body with base64-encoded audio in `input_audio.data` (not OpenAI-style multipart), so the request builder switches wire format when this provider is selected. Free-text model field accepts any OpenRouter STT model id (e.g. `google/chirp-3`). Closes #769.
+
 ## [1.7.2] - 2026-05-20
 
 A small patch on top of 1.7.1: zero unnecessary macOS Keychain prompts on first launch, working cloud transcription on Electron's `net.fetch`, the Note Formatting selector now actually controls model routing, Wave Terminal pastes via the terminal path, and a notes view stability fix.
